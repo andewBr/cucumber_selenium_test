@@ -12,7 +12,7 @@ public class MainPageStep {
     private  MainPageService mainPageService;
 
 
-    @Step("open habr page")
+
     @Given("I am on main habr page")
     public void openMainPage() {
         mainPageService.openPage();

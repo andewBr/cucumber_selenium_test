@@ -12,6 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.net.MalformedURLException;
 
 import java.net.URI;
+//import org.openqa.selenium.Proxy;
 
 @Configuration
 @ComponentScan("com.cucumber")
@@ -23,7 +24,10 @@ public class WebdriverBeanConfig {
     @Bean
     public WebDriver containerChrome() throws MalformedURLException {
 
+        //Proxy proxy = new Proxy();
+        //proxy.setSslProxy("http://ваш-прокси-сервер:3128");
         DesiredCapabilities capabilities = new DesiredCapabilities();
+        //capabilities.setCapability("proxy", proxy);
         capabilities.setBrowserName("chrome");
         capabilities.setVersion("78.0");
         capabilities.setCapability("enableVNC", true);

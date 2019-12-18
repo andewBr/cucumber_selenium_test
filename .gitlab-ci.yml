@@ -1,0 +1,27 @@
+---
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=/home/gitlab-runner/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
+before_script:
+  - export PATH="/opt/rh/rh-maven33/root/usr/bin:$PATH"
+
+build:
+  stage: build
+  script:
+    - aerokube-cm selenoid start --force --browsers "firefox:70;firefox:71;chrome:78;chrome:79" --registry https://ваш-docker-registry
+    - aerokube-cm selenoid-ui start --registry https://ваш-docker-registry
+    - cat ~/.aerokube/selenoid/browsers.json
+    - set +e
+    - mvn -s maven_settings.xml clean install -Dmaven.test.skip=true
+    #- mvn -s maven_settings.xml clean test -Dspring.profiles.active=dev-andrew || EXIT_CODE=$?
+    - mvn -s maven_settings.xml clean test || EXIT_CODE=$?
+    - mvn -s maven_settings.xml allure:aggregate;
+    - export PATH_WITHOUT_HOME=$(pwd | sed -e "s/\/home\/gitlab-runner\/builds//g")
+    - echo '***********************************************************************'
+    - echo "http://$HOSTNAME:9090$PATH_WITHOUT_HOME/target/site/allure-maven-plugin/"
+    - echo '***********************************************************************'
+    - set -e
+    - exit ${EXIT_CODE}
+  tags:
+    - internet-platform-shell
